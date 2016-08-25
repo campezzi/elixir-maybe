@@ -35,9 +35,5 @@ defimpl Monad, for: Maybe do
   def flat_map(%Maybe{value: {:just, value}}, function) do
     value
     |> function.()
-    |> case do
-      %Maybe{} = wrapped_value -> wrapped_value
-      unwrapped_value -> Maybe.just(unwrapped_value)
-    end
   end
 end
