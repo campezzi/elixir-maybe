@@ -66,15 +66,14 @@ function _that takes an unwrapped value and returns a wrapped value_ can be appl
 _wrapped value_.
 
 Think about it for a second. We saw that `Functor.map` can unwrap a value, apply a function to it,
-and then wrap the result. But what if that function itself returns a wrapped value? You would end
-up with a _nested wrapped value_! `flat_map` avoids that by ensuring that a value is never nested -
-hence that _flat_ bit in the name.
+and then wrap the result. But what if that function itself returns a wrapped value? `map` would
+wrap it again and you would end up with a _nested wrapped value_! `flat_map` avoids that by ensuring
+that a value is never nested - hence that _flat_ bit in the name.
 
-`Maybe` implements `flat_map` by unwrapping the value, then applying the function to it. If the
-result is a wrapped value, it's returned as is; otherwise, it gets wrapped and returned. In strong
+`Maybe` implements `flat_map` by unwrapping the value, then applying the function to it. In strong
 typed functional programming languages, you can be sure that the function passed to `flat_map`
-will return a wrapped value. Since Elixir is not one of those languages, `Maybe` has to ensure the
-resulting value is wrapped to ensure a `Maybe` comes in and a `Maybe` comes out.
+will return a wrapped value. Since Elixir is not one of those languages, you have to be more
+careful about what it returns - always ensuring that it's a wrapped value. Why, you ask? Read on!
 
 
 ## So why does this matter?
@@ -103,17 +102,17 @@ do all the unwrap/wrap dance, ensuring a `Maybe` comes out the other end even if
 applied has no idea any of that is going on.
 
 We then pipe that `Maybe` into `flat_map` with a function that simply returns a `Maybe` containing
-`:nothing`. This is a contrived example, but the main point is a `Maybe` comes in and, again, a
-`Maybe` comes out. And because we used `flat_map`, the result isn't double-wrapped - it's "flat".
+`:nothing`. This is a contrived example, but the main point is a wrapped value comes in and a
+wrapped value comes out. And because we used `flat_map`, the result isn't double-wrapped - it's
+"flat".
 
 Finally, we pipe that into a `map` again. But wait! At this stage, our `Maybe` contains `:nothing`.
 So `map` won't even try to apply that function and simply return a `Maybe` containing `:nothing`.
 
-So there you go: by ensuring each function in the pipeline takes a `Maybe` and returns a `Maybe`,
-and that `map` and `flat_map` know how to handle `Maybe` values (or, if you want to sound really
-smart, by ensuring that `Maybe` is a functor and a monad), we can simply pipe the crap out of
-everything, even if the functions we apply don't expect wrapped values at all and even if we
-suddenly get a `:nothing` along the road.
+So there you go: by ensuring each function in the pipeline takes a wrapped value and returns a
+wrapped value and ensuring that `map` and `flat_map` know how to handle `Maybe` values (or, if you
+want to sound really smart, by ensuring that `Maybe` is a functor and a monad), we can simply pipe
+the crap out of everything, even if the functions we apply don't expect wrapped values at all.
 
 The `Maybe` type is useful when a pipeline contains a function may or may not return a value, yet
 you don't want to manually pattern match against `nil` in all functions that come after that one in
@@ -121,10 +120,18 @@ the pipeline simply to return `nil` again. It looks cleaner and lets you focus o
 of your transformations knowing that, if any step returns a `:nothing`, you'll just get `:nothing`
 at the end.
 
+Now here's the best part - if you have several container types that are functors, applicative
+functors and/or monads, you can create a pipeline that operates on wrapped values all the way, and
+each step will know how to unwrap/rewrap the values in the appropriate containers depending on how
+they implement `map`, `flat_map` and, to a lesser extent in Elixir, `ap`.
+
+
+## A small challenge
+
 If you're looking for some practice, try implementing the `Result` struct and writing
 implementations of the `Functor`, `Applicative` and `Monad` protocols for it. You should be able to
 pipe several transformations that return `Result` types without worrying about one of the steps
-returning an error result. In the end, you should get a final `Result` which will either be
+returning an error result. In the end, you should get a final `Result` which will either contain
 `{:ok, value}` if all steps succeeded, or `{:error, message}` for the first step that failed.
 
 
@@ -132,13 +139,12 @@ returning an error result. In the end, you should get a final `Result` which wil
 
 Good question. The `with` form has a similar purpose - it lets you perform a series of
 transformations in your data while pattern matching every step along to way to make sure you're
-getting the expected result. It works well, but depending on the case it may not look too readable.
+getting the expected result and, if necessary, manually unwrapping it. It works well, but depending
+on the case it may not look too readable.
 
 Fun fact about `with` - its syntax is remarkably similar to Haskell's `do` form. That is syntactic
 sugar to multiple calls to `>>=` that perform a series of transformations on data. And guess what
 `>>=` is? It's roughly the Haskell equivalent of what we implemented here as `Monad.flat_map`.
-
-Mind: blown!
 
 PS: `>>=` is pronounced `bind`, in case you were wondering.
 
