@@ -25,7 +25,7 @@ Erlang have great pattern matching, it's often convenient to use tuples over mor
 container types. Still, they can be somewhat replicated with structs, which is how the `Maybe`
 type was implemented here.
 
-Functor, Applicative Functor and Monad are just adjectives used to describe container types that
+Functor, Applicative Functor and Monad are just nouns used to describe container types that
 conform to certain behaviours. In Elixir, they can be thought of as very simple protocols - so
 that's how I implemented them here. You can find those protocols in `lib`.
 
