@@ -99,8 +99,8 @@ you don't want to manually pattern match against `nil` in all functions that com
 the pipeline simply to return `nil` again. In that snippet, both calls to `half/1` may fail if the
 provided number is odd, yet there's no explicit checking for that on the next steps. That works
 because `half/1` returns a `Maybe`, and future calls to `flat_map` and `map` will know how to deal
-with cases when it contains `:nothing`. That's right: __that knowledge lives in the implementation of
-Functor and Monad for the `Maybe` type__, not in our code!
+with cases when it contains `:nothing`. __That knowledge lives in the implementation of the Functor
+and Monad protocols for the `Maybe` type.__ Our application's code gets that stuff for free.
 
 Check out `lib/example.ex` for more information and a cool example using `FancyOperators` instead
 of the generic pipe operator provided by Elixir!
