@@ -8,7 +8,7 @@ built by much smarter people that accomplish the same thing in better ways). It 
 experiment to help explain how a `Maybe` works, and also what `Functors`, `Applicatives` and
 `Monads` are.
 
-Take a look at `test/maybe_test.exs` for a quick look at how this can be used.
+Take a look at `test/maybe_test.exs` to get a sense of how `Maybe` can be used.
 
 
 ## Functors, Applicative Functors, Monads, WTF?!
