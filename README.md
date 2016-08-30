@@ -96,17 +96,20 @@ end
 
 The `Maybe` type is useful when a pipeline contains a function may or may not return a value, yet
 you don't want to manually pattern match against `nil` in all functions that come after that one in
-the pipeline simply to return `nil` again. It looks cleaner and lets you focus on the "happy path"
-of your transformations knowing that, if any step returns a `:nothing`, you'll just get `:nothing`
-at the end.
+the pipeline simply to return `nil` again. In that snippet, both calls to `half/1` may fail if the
+provided number is odd, yet there's no explicit checking for that on the next steps. That works
+because `half/1` returns a `Maybe`, and future calls to `flat_map` and `map` will know how to deal
+with cases when it contains `:nothing`. That's right: _that knowledge lives in the implementation of
+Functor and Monad for the `Maybe` type_, not in our code!
 
 Check out `lib/example.ex` for more information and a cool example using `FancyOperators` instead
 of the generic pipe operator provided by Elixir!
 
-Now here's the best part - if you have several container types that are functors, applicative
+And it gets even better - if you have several container types that are functors, applicative
 functors and/or monads, you can create a pipeline that operates on wrapped values all the way, and
 each step will know how to unwrap/rewrap the values in the appropriate containers depending on how
-they implement `map`, `flat_map` and, to a lesser extent in Elixir, `ap`.
+they implement `map`, `flat_map` and, to a lesser extent in Elixir, `ap`. Your code will be cleaner
+and just as "safe" as it would if you implemented all those checks yourself.
 
 
 ## A small challenge
