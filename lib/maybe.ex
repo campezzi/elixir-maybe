@@ -14,7 +14,7 @@ defmodule Maybe do
 end
 
 defimpl Functor, for: Maybe do
-  def map(%{value: :nothing} = nothing, _function), do: nothing
+  def map(%{value: :nothing}, _function), do: Maybe.nothing
 
   def map(%{value: {:just, value}}, function) do
     value
@@ -24,13 +24,8 @@ defimpl Functor, for: Maybe do
 end
 
 defimpl Applicative, for: Maybe do
-  def ap(%Maybe{value: :nothing} = nothing, _), do: nothing
-  def ap(%Maybe{value: {:just, _}} = value, %Maybe{value: :nothing}), do: value
-  def ap(%Maybe{value: {:just, value}}, %Maybe{value: {:just, function}}) do
-    value
-    |> function.()
-    |> Maybe.wrap
-  end
+  def ap(_, %Maybe{value: :nothing}), do: Maybe.nothing
+  def ap(some_value, %Maybe{value: {:just, function}}), do: Functor.map(some_value, function)
 end
 
 defimpl Monad, for: Maybe do
