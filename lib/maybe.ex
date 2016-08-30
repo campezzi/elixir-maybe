@@ -9,17 +9,16 @@ defmodule Maybe do
     %Maybe{value: {:just, value}}
   end
 
-  def wrap(nil), do: Maybe.nothing
-  def wrap(value), do: Maybe.just(value)
+  def of(nil), do: Maybe.nothing
+  def of(value), do: Maybe.just(value)
 end
 
 defimpl Functor, for: Maybe do
-  def map(%{value: :nothing}, _function), do: Maybe.nothing
-
-  def map(%{value: {:just, value}}, function) do
+  def map(%Maybe{value: :nothing}, _function), do: Maybe.nothing
+  def map(%Maybe{value: {:just, value}}, function) do
     value
     |> function.()
-    |> Maybe.wrap
+    |> Maybe.of
   end
 end
 

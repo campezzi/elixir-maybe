@@ -27,7 +27,7 @@ type was implemented here.
 
 Functor, Applicative Functor and Monad are just nouns used to describe container types that
 conform to certain behaviours. In Elixir, they can be thought of as very simple protocols - so
-that's how I implemented them here. You can find those protocols in `lib`.
+that's how I implemented them here. You can find those protocols in `lib/protocols`.
 
 `Maybe` is a simple struct module that has implementations defined for the `Functor`, `Applicative`
 and `Monad` protocols. And that's all there is to it!
@@ -78,20 +78,19 @@ careful about what it returns - always ensuring that it's a wrapped value. Why, 
 
 ## So why does this matter?
 
-Consider this test in `test/maybe_test.exs`:
+There's a common use case for container types in `lib/example.ex` - take a look at that file for
+more details. Here's a snippet:
 
 ```elixir
-test "chaining: if something returns 'nothing' along the way, it just works" do
+def without_operators(number) do
   import Functor
   import Monad
 
-  expected =
-    Maybe.just("abc")
-    |> map(fn x -> String.upcase(x) end)
-    |> flat_map(fn _ -> Maybe.nothing end)
-    |> map(fn x -> x * 2 end)
-
-  assert expected == Maybe.nothing
+  Maybe.of(number)
+  |> flat_map(&half/1)
+  |> flat_map(&half/1)
+  |> map(fn x -> "The result of dividing #{number} by 4 is #{x}!" end)
+  |> map(&String.upcase/1)
 end
 ```
 
