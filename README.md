@@ -94,30 +94,14 @@ def without_operators(number) do
 end
 ```
 
-Throughout the entire chain, the value is wrapped in a `Maybe` container. First, it's piped into
-`map`, where `String.upcase` is applied. Now, that function expects an ordinary unwrapped string
-and returns an equally ordinary string. However, because `Maybe` is a functor, `map` knows how to
-do all the unwrap/wrap dance, ensuring a `Maybe` comes out the other end even if the function
-applied has no idea any of that is going on.
-
-We then pipe that `Maybe` into `flat_map` with a function that simply returns a `Maybe` containing
-`:nothing`. This is a contrived example, but the main point is a wrapped value comes in and a
-wrapped value comes out. And because we used `flat_map`, the result isn't double-wrapped - it's
-"flat".
-
-Finally, we pipe that into a `map` again. But wait! At this stage, our `Maybe` contains `:nothing`.
-So `map` won't even try to apply that function and simply return a `Maybe` containing `:nothing`.
-
-So there you go: by ensuring each function in the pipeline takes a wrapped value and returns a
-wrapped value and ensuring that `map` and `flat_map` know how to handle `Maybe` values (or, if you
-want to sound really smart, by ensuring that `Maybe` is a functor and a monad), we can simply pipe
-the crap out of everything, even if the functions we apply don't expect wrapped values at all.
-
 The `Maybe` type is useful when a pipeline contains a function may or may not return a value, yet
 you don't want to manually pattern match against `nil` in all functions that come after that one in
 the pipeline simply to return `nil` again. It looks cleaner and lets you focus on the "happy path"
 of your transformations knowing that, if any step returns a `:nothing`, you'll just get `:nothing`
 at the end.
+
+Check out `lib/example.ex` for more information and a cool example using `FancyOperators` instead
+of the generic pipe operator provided by Elixir!
 
 Now here's the best part - if you have several container types that are functors, applicative
 functors and/or monads, you can create a pipeline that operates on wrapped values all the way, and
