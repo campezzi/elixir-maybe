@@ -10,6 +10,8 @@ experiment to help explain how a `Maybe` works, and also what `Functors`, `Appli
 
 Take a look at `test/maybe_test.exs` to get a sense of how `Maybe` can be used.
 
+> Disclaimer: this was done before I was enlightened by the concept of [laws](https://www.youtube.com/watch?v=VzNGF4V937o)
+> and may contain incorrect information. Don't trust everything here blindly :)
 
 ## Functors, Applicative Functors, Monads, WTF?!
 
